@@ -1,37 +1,44 @@
 library figures;
 
 import 'dart:math';
+import 'common.dart';
 import 'constants.dart';
 
 mixin StraightRunner {
   //Move to horizontal
-  List<Point> getPointsToStraightMove(Point figurePosition) {
-    List<Point> points = [];
+  List<SpaceName> getPointsToStraightMove(SpaceName currentSpaceName) {
+    List<Point> newPoints = [];
+    final Point figurePosition = chessboard[currentSpaceName]!;
     for (var x = 0; x < chessboardSizeX; x++) {
       final Point movePoint = Point(x, figurePosition.y);
       if (movePoint != figurePosition) {
-        points.add(movePoint);
+        newPoints.add(movePoint);
+      }
+      else {
+        print(movePoint);
+        print(figurePosition);
       }
     }
     //Move to vertical
     for (var y = 0; y < chessboardSizeY; y++) {
       final Point movePoint = Point(figurePosition.x, y);
       if (movePoint != figurePosition) {
-        points.add(movePoint);
+        newPoints.add(movePoint);
       }
     }
-    return points;
+    return getCleanSpaceName(newPoints);
   }
 }
 
 mixin DiagonalRunner {
-  List<Point> getPointsToDiagonalMove(Point figurePosition) {
-    List<Point> points = [];
+  List<SpaceName> getPointsToDiagonalMove(SpaceName currentSpaceName) {
+    List<Point> newPoints = [];
+    final Point figurePosition = chessboard[currentSpaceName]!;
     var x = figurePosition.x + 1;
     var y = figurePosition.y + 1;
     //Move to up
     while (x <= chessboardSizeX - 1 && y <= chessboardSizeY - 1) {
-      points.add(Point(x, y));
+      newPoints.add(Point(x, y));
       x++;
       y++;
     }
@@ -40,23 +47,23 @@ mixin DiagonalRunner {
     y = figurePosition.y - 1;
     //Move to down
     while (x >= 0 && y >= 0) {
-      points.add(Point(x, y));
+      newPoints.add(Point(x, y));
       x--;
       y--;
     }
-    return points;
+    return getCleanSpaceName(newPoints);
   }
 }
 
 abstract class Figure {
   final Side _startSide;
   final Color _color;
-  Point _position;
+  SpaceName _position;
   bool _death = false;
 
   Figure(this._color, this._startSide, this._position);
 
-  Point get currentPosition {
+  SpaceName get currentPosition {
     return _position;
   }
 
@@ -72,14 +79,14 @@ abstract class Figure {
     return false;
   }
 
-  void gambit(Point point) {
-    _position = point;
-    print("$_color $runtimeType на");
+  void gambit(SpaceName space) {
+    _position = space;
+    print("$_color $runtimeType на $_position");
   }
 
-  List<Point> getPointsToMove();
+  List<SpaceName> getPointsToMove();
 
-  List<Point> getPointsToAttack() {
+  List<SpaceName> getPointsToAttack() {
     return getPointsToMove();
   }
 }
@@ -87,67 +94,65 @@ abstract class Figure {
 class Pawn extends Figure {
   Course _course = Course.up;
 
-  Pawn(Color color, Side startSide, Point position)
+  Pawn(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position) {
     _startSide == Side.top ? _course = Course.down : _course = Course.up;
   }
 
   @override
-  List<Point> getPointsToMove() {
-    var x = _position.x;
-    var y = _position.y;
+  List<SpaceName> getPointsToMove() {
+    var x = chessboard[_position]!.x;
+    var y = chessboard[_position]!.y;
     var newYCoord = _course == Course.up ? y + 1 : y - 1;
-    List<Point> points = [Point(x, newYCoord)];
-    print(_course);
-    return points;
+    return getCleanSpaceName([Point(x, newYCoord)]);
   }
 
   @override
-  List<Point> getPointsToAttack() {
-    var x = _position.x;
-    var y = _position.y;
+  List<SpaceName> getPointsToAttack() {
+    var x = chessboard[_position]!.x;
+    var y = chessboard[_position]!.y;
     var newYCoord = _course == Course.up ? y + 1 : y - 1;
-    List<Point> points = [Point(x - 1, newYCoord), Point(x + 1, newYCoord)];
-    return points;
+    List<Point> newPoints = [Point(x - 1, newYCoord), Point(x + 1, newYCoord)];
+    return getCleanSpaceName(newPoints);
   }
 }
 
 class Horse extends Figure {
-  Horse(Color color, Side startSide, Point position)
+  Horse(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
-  @override
-  bool get canJump {
-    return true;
-  }
+    @override
+    bool get canJump {
+      return true;
+    }
 
-  @override
-  List<Point> getPointsToMove() {
-    var x = _position.x;
-    var y = _position.y;
-    List<Point> points = [
-      Point(x + 2, y + 1),
-      Point(x + 2, y - 1),
-      Point(x - 2, y + 1),
-      Point(x - 2, y - 1),
-      Point(x + 1, y + 2),
-      Point(x + 1, y - 2),
-      Point(x - 1, y + 2),
-      Point(x - 1, y - 2),
-    ];
-    return points;
+    @override
+    List<SpaceName> getPointsToMove() {
+      var x = chessboard[_position]!.x;
+      var y = chessboard[_position]!.y;
+      List<Point> newPoints = [
+        Point(x + 2, y + 1),
+        Point(x + 2, y - 1),
+        Point(x - 2, y + 1),
+        Point(x - 2, y - 1),
+        Point(x + 1, y + 2),
+        Point(x + 1, y - 2),
+        Point(x - 1, y + 2),
+        Point(x - 1, y - 2),
+      ];
+      return getCleanSpaceName(newPoints);
+    }
   }
-}
 
 class King extends Figure {
-  King(Color color, Side startSide, Point position)
+  King(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
   @override
-  List<Point> getPointsToMove() {
-    var x = _position.x;
-    var y = _position.y;
-    List<Point> points = [
+  List<SpaceName> getPointsToMove() {
+    var x = chessboard[_position]!.x;
+    var y = chessboard[_position]!.y;
+    List<Point> newPoints = [
       Point(x + 1, y + 1),
       Point(x + 1, y - 1),
       Point(x - 1, y + 1),
@@ -157,37 +162,37 @@ class King extends Figure {
       Point(x, y + 1),
       Point(x, y - 1),
     ];
-    return points;
+    return getCleanSpaceName(newPoints);
   }
 }
 
 class Queen extends Figure with StraightRunner, DiagonalRunner {
-  Queen(Color color, Side startSide, Point position)
+  Queen(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
   @override
-  List<Point> getPointsToMove() {
+  List<SpaceName> getPointsToMove() {
     return getPointsToStraightMove(_position) +
         getPointsToDiagonalMove(_position);
   }
 }
 
 class Bishop extends Figure with DiagonalRunner {
-  Bishop(Color color, Side startSide, Point position)
+  Bishop(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
   @override
-  List<Point> getPointsToMove() {
+  List<SpaceName> getPointsToMove() {
     return getPointsToDiagonalMove(_position);
   }
 }
 
 class Castle extends Figure with StraightRunner {
-  Castle(Color color, Side startSide, Point position)
+  Castle(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
   @override
-  List<Point> getPointsToMove() {
+  List<SpaceName> getPointsToMove() {
     return getPointsToStraightMove(_position);
   }
 }
