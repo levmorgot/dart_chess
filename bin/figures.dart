@@ -7,14 +7,14 @@ mixin StraightRunner {
   //Move to horizontal
   List<Point> getPointsToStraightMove(Point figurePosition) {
     List<Point> points = [];
-    for (var x = 0; x < xLineName.length; x++) {
+    for (var x = 0; x < chessboardSizeX; x++) {
       final Point movePoint = Point(x, figurePosition.y);
       if (movePoint != figurePosition) {
         points.add(movePoint);
       }
     }
     //Move to vertical
-    for (var y = 0; y < yLineName.length; y++) {
+    for (var y = 0; y < chessboardSizeY; y++) {
       final Point movePoint = Point(figurePosition.x, y);
       if (movePoint != figurePosition) {
         points.add(movePoint);
@@ -30,7 +30,7 @@ mixin DiagonalRunner {
     var x = figurePosition.x + 1;
     var y = figurePosition.y + 1;
     //Move to up
-    while (x <= xLineName.length - 1 && y <= yLineName.length - 1) {
+    while (x <= chessboardSizeX - 1 && y <= chessboardSizeY - 1) {
       points.add(Point(x, y));
       x++;
       y++;
@@ -74,8 +74,7 @@ abstract class Figure {
 
   void gambit(Point point) {
     _position = point;
-    print(
-        "${_color} ${this.runtimeType} на ${xLineName[point.x.toInt()]}${yLineName[point.y.toInt()]}");
+    print("$_color $runtimeType на");
   }
 
   List<Point> getPointsToMove();
