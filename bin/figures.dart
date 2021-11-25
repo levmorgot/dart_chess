@@ -93,6 +93,7 @@ abstract class Figure {
 
 class Pawn extends Figure {
   Course _course = Course.up;
+  bool _moved = false;
 
   Pawn(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position) {
@@ -104,7 +105,12 @@ class Pawn extends Figure {
     var x = chessboard[_position]!.x;
     var y = chessboard[_position]!.y;
     var newYCoord = _course == Course.up ? y + 1 : y - 1;
-    return getCleanSpaceName([Point(x, newYCoord)]);
+    List<Point> newPoints = [Point(x, newYCoord)];
+    if (!_moved) {
+      var newYCoordForDoubleCells = _course == Course.up ? y + 2 : y - 2;
+      newPoints.add(Point(x, newYCoordForDoubleCells));
+    }
+    return getCleanSpaceName(newPoints);
   }
 
   @override
