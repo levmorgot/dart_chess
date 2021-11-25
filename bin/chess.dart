@@ -1,18 +1,20 @@
 import 'dart:math';
-import 'figures.dart';
+import 'figure_factories.dart';
 import 'constants.dart';
+import 'player.dart';
 
 List<Point> cells = [];
 
 void main() {
-
-
-  Figure pawn = Pawn(Color.black, Side.bottom, SpaceName.b2);
-  Figure horse = Horse(Color.black, Side.bottom, SpaceName.e4);
-  Figure king = King(Color.black, Side.bottom, SpaceName.e4);
-  Figure queen = Queen(Color.black, Side.bottom, SpaceName.e4);
-  Figure bishop = Bishop(Color.black, Side.bottom, SpaceName.e4);
-  Figure castle = Castle(Color.black, Side.bottom, SpaceName.e4);
+  Player player1 = Player(1, ChessFigureFactory(Color.black, Side.bottom));
+  for (var figure in player1.figures) {
+    print('${figure.runtimeType}, ${figure.currentPosition}');
+  }
+  print("_______________________________");
+  Player player2 = Player(2, ChessFigureFactory(Color.white, Side.top));
+  for (var figure in player2.figures) {
+    print('${figure.runtimeType}, ${figure.currentPosition}');
+  }
 
   // print(pawn.runtimeType);
   // print(pawn.currentPosition);
@@ -38,15 +40,15 @@ void main() {
   // print(queen.getPointsToAttack());
   // queen.gambit(queen.getPointsToMove()[0]);
 
-  print(bishop.runtimeType);
-  print(bishop.currentPosition);
-  print(bishop.getPointsToMove());
-  print(bishop.getPointsToAttack());
-  bishop.gambit(queen.getPointsToMove()[0]);
-
-  print(castle.runtimeType);
-  print(castle.currentPosition);
-  print(castle.getPointsToMove());
-  print(castle.getPointsToAttack());
-  castle.gambit(castle.getPointsToMove()[0]);
+  // print(bishop.runtimeType);
+  // print(bishop.currentPosition);
+  // print(bishop.getPointsToMove());
+  // print(bishop.getPointsToAttack());
+  // bishop.gambit(queen.getPointsToMove()[0]);
+  //
+  // print(castle.runtimeType);
+  // print(castle.currentPosition);
+  // print(castle.getPointsToMove());
+  // print(castle.getPointsToAttack());
+  // castle.gambit(castle.getPointsToMove()[0]);
 }
