@@ -60,13 +60,9 @@ class Game {
     ].join(' '));
   }
 
-  void move(SpaceName startPoint, SpaceName endPoint) {
-    try {
-      Figure figure = gameBoard[startPoint]!;
-      gameBoard[startPoint] = null;
-      gameBoard[endPoint] = figure;
-    } catch (_) {
-      throw Exception('Начальная клетка пуста');
-    }
+  void move(Figure figure, SpaceName aimPoint) {
+    gameBoard[figure.currentPosition] = null;
+    figure.gambit(aimPoint);
+    gameBoard[figure.currentPosition] = figure;
   }
 }
