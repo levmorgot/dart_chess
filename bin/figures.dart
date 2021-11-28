@@ -14,10 +14,6 @@ mixin StraightRunner {
       if (movePoint != figurePosition) {
         newPoints.add(movePoint);
       }
-      else {
-        print(movePoint);
-        print(figurePosition);
-      }
     }
     //Move to vertical
     for (var y = 0; y < chessboardSizeY; y++) {

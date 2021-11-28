@@ -11,6 +11,7 @@ class Game {
   late Player player1;
   late Player player2;
   late Player activePlayer;
+  Figure? activeFigure;
 
   Game(player1Id, player2Id) {
     player1 = Player(player1Id, ChessFigureFactory(Color.black, Side.bottom));
@@ -73,7 +74,10 @@ class Game {
     try {
       Figure figure = gameBoard[point]!;
       try {
-        return activePlayer.figures.firstWhere((element) => element == figure);
+        Figure fig =
+            activePlayer.figures.firstWhere((element) => element == figure);
+        activeFigure = fig;
+        return fig;
       } catch (_) {
         print('Вы не можете играть фигурами другого игрока');
         return null;
@@ -213,7 +217,8 @@ class Game {
       return wayPoints;
     }
     if (figure.runtimeType == Queen) {
-      wayPoints = _getPossibilityPointsDiagonal(figure) + _getPossibilityPointsStraight(figure);
+      wayPoints = _getPossibilityPointsDiagonal(figure) +
+          _getPossibilityPointsStraight(figure);
       return wayPoints;
     }
     if (figure.runtimeType == Bishop) {
@@ -239,6 +244,93 @@ class Game {
     }
     figure.gambit(aimPoint);
     gameBoard[figure.currentPosition] = figure;
+    activeFigure = null;
     _switchActivePlayer();
+  }
+
+  void printBoardColor() {
+    print([
+      '   ',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+    ].join(' '));
+    print('___________________');
+    for (int x = chessboardSizeX - 1; x >= 0; x--) {
+      List<String> lineFigures = [];
+      List<SpaceName> possibilityPoints =
+          activeFigure != null ? getPossibilityPoints(activeFigure!) : [];
+      for (int y = 0; y < chessboardSizeX; y++) {
+        var point = SpaceName.values[y * 8 + x];
+        var valuePoint = gameBoard[point];
+        var type = valuePoint.runtimeType;
+        if (activeFigure != null) {
+          if (type != Null) {
+            if (possibilityPoints.contains(point)) {
+              lineFigures.add(_setTextColorMagenta(type.toString()[0]));
+            } else if (activeFigure!.currentPosition == point) {
+              lineFigures.add(_setTextColorYellow(type.toString()[0]));
+            } else {
+              lineFigures.add(_isFriendFigure(point)
+                  ? _setTextColorGreen(type.toString()[0])
+                  : _setTextColorRed(type.toString()[0]));
+            }
+          } else {
+            if (possibilityPoints.contains(point)) {
+              lineFigures.add(_setTextColorBlue('-'));
+            } else {
+              lineFigures.add('-');
+            }
+          }
+        } else {
+          if (type != Null) {
+            lineFigures.add(_isFriendFigure(point)
+                ? _setTextColorGreen(type.toString()[0])
+                : _setTextColorRed(type.toString()[0]));
+          } else {
+            lineFigures.add('-');
+          }
+        }
+      }
+      lineFigures.insert(0, '${x + 1} |');
+      print(lineFigures.join(' '));
+    }
+    print('___________________');
+    print([
+      '   ',
+      'a',
+      'b',
+      'c',
+      'd',
+      'e',
+      'f',
+      'g',
+      'h',
+    ].join(' '));
+  }
+
+  String _setTextColorYellow(String text) {
+    return '\x1B[33m$text\x1B[0m';
+  }
+
+  String _setTextColorRed(String text) {
+    return '\x1B[31m$text\x1B[0m';
+  }
+
+  String _setTextColorBlue(String text) {
+    return '\x1B[34m$text\x1B[0m';
+  }
+
+  String _setTextColorGreen(String text) {
+    return '\x1B[32m$text\x1B[0m';
+  }
+
+  String _setTextColorMagenta(String text) {
+    return '\x1B[35m$text\x1B[0m';
   }
 }
