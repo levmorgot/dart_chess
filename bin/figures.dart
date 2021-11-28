@@ -26,7 +26,7 @@ mixin StraightRunner {
         newPoints.add(movePoint);
       }
     }
-    return getCleanSpaceName(newPoints);
+    return pointsListToSpaceNamesList(newPoints);
   }
 }
 
@@ -36,7 +36,7 @@ mixin DiagonalRunner {
     final Point figurePosition = chessboard[currentSpaceName]!;
     var x = figurePosition.x + 1;
     var y = figurePosition.y + 1;
-    //Move to up
+    //Move to left up
     while (x <= chessboardSizeX - 1 && y <= chessboardSizeY - 1) {
       newPoints.add(Point(x, y));
       x++;
@@ -44,14 +44,32 @@ mixin DiagonalRunner {
     }
 
     x = figurePosition.x - 1;
+    y = figurePosition.y + 1;
+    //Move to right up
+    while (x <= chessboardSizeX - 1 && y <= chessboardSizeY - 1) {
+      newPoints.add(Point(x, y));
+      x--;
+      y++;
+    }
+
+    x = figurePosition.x - 1;
     y = figurePosition.y - 1;
-    //Move to down
+    //Move to right down
     while (x >= 0 && y >= 0) {
       newPoints.add(Point(x, y));
       x--;
       y--;
     }
-    return getCleanSpaceName(newPoints);
+
+    x = figurePosition.x + 1;
+    y = figurePosition.y - 1;
+    //Move to left down
+    while (x >= 0 && y >= 0) {
+      newPoints.add(Point(x, y));
+      x++;
+      y--;
+    }
+    return pointsListToSpaceNamesList(newPoints);
   }
 }
 
@@ -79,8 +97,8 @@ abstract class Figure {
     return false;
   }
 
-  void gambit(SpaceName space) {
-    _position = space;
+  void gambit(SpaceName point) {
+    _position = point;
     print("$_color $runtimeType на $_position");
   }
 
@@ -110,7 +128,13 @@ class Pawn extends Figure {
       var newYCoordForDoubleCells = _course == Course.up ? y + 2 : y - 2;
       newPoints.add(Point(x, newYCoordForDoubleCells));
     }
-    return getCleanSpaceName(newPoints);
+    return pointsListToSpaceNamesList(newPoints);
+  }
+
+  @override
+  void gambit(SpaceName point) {
+    _moved = true;
+    super.gambit(point);
   }
 
   @override
@@ -119,7 +143,7 @@ class Pawn extends Figure {
     var y = chessboard[_position]!.y;
     var newYCoord = _course == Course.up ? y + 1 : y - 1;
     List<Point> newPoints = [Point(x - 1, newYCoord), Point(x + 1, newYCoord)];
-    return getCleanSpaceName(newPoints);
+    return pointsListToSpaceNamesList(newPoints);
   }
 }
 
@@ -146,7 +170,7 @@ class Horse extends Figure {
         Point(x - 1, y + 2),
         Point(x - 1, y - 2),
       ];
-      return getCleanSpaceName(newPoints);
+      return pointsListToSpaceNamesList(newPoints);
     }
   }
 
@@ -168,7 +192,7 @@ class King extends Figure {
       Point(x, y + 1),
       Point(x, y - 1),
     ];
-    return getCleanSpaceName(newPoints);
+    return pointsListToSpaceNamesList(newPoints);
   }
 }
 
