@@ -26,46 +26,6 @@ class Game {
     });
   }
 
-  void printBoard() {
-    print([
-      '   ',
-      'a',
-      'b',
-      'c',
-      'd',
-      'e',
-      'f',
-      'g',
-      'h',
-    ].join(' '));
-    print('___________________');
-    for (int x = chessboardSizeX - 1; x >= 0; x--) {
-      List<String> lineFigures = [];
-      for (int y = 0; y < chessboardSizeX; y++) {
-        var type = gameBoard[SpaceName.values[y * 8 + x]].runtimeType;
-        if (type != Null) {
-          lineFigures.add(type.toString()[0]);
-        } else {
-          lineFigures.add('-');
-        }
-      }
-      lineFigures.insert(0, '${x + 1} |');
-      print(lineFigures.join(' '));
-    }
-    print('___________________');
-    print([
-      '   ',
-      'a',
-      'b',
-      'c',
-      'd',
-      'e',
-      'f',
-      'g',
-      'h',
-    ].join(' '));
-  }
-
   void _switchActivePlayer() {
     activePlayer = activePlayer == player1 ? player2 : player1;
   }
@@ -174,8 +134,8 @@ class Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       names = names
           .where((element) =>
-      spaceNameToPoint(element).x == currentPoint.x ||
-          spaceNameToPoint(element).y == currentPoint.y)
+              spaceNameToPoint(element).x == currentPoint.x ||
+              spaceNameToPoint(element).y == currentPoint.y)
           .toList();
     }
     List<SpaceName> namesUp = [];
@@ -233,15 +193,10 @@ class Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       wayPoints = _getPossibilityPointsDiagonal(figure) +
           _getPossibilityPointsStraight(figure);
-      return wayPoints;
-    }
-    if (figure.moveToDiagonal) {
+    } else if (figure.moveToDiagonal) {
       wayPoints = _getPossibilityPointsDiagonal(figure);
-      return wayPoints;
-    }
-    if (figure.moveToStraight) {
+    } else if (figure.moveToStraight) {
       wayPoints = _getPossibilityPointsStraight(figure);
-      return wayPoints;
     }
     return wayPoints;
   }
@@ -286,17 +241,17 @@ class Game {
         if (activeFigure != null) {
           if (type != Null) {
             if (possibilityPoints.contains(point)) {
-              lineFigures.add(_setTextColorMagenta(type.toString()[0]));
+              lineFigures.add(setTextColorMagenta(type.toString()[0]));
             } else if (activeFigure!.currentPosition == point) {
-              lineFigures.add(_setTextColorYellow(type.toString()[0]));
+              lineFigures.add(setTextColorYellow(type.toString()[0]));
             } else {
               lineFigures.add(_isFriendFigure(point)
-                  ? _setTextColorGreen(type.toString()[0])
-                  : _setTextColorRed(type.toString()[0]));
+                  ? setTextColorGreen(type.toString()[0])
+                  : setTextColorRed(type.toString()[0]));
             }
           } else {
             if (possibilityPoints.contains(point)) {
-              lineFigures.add(_setTextColorBlue('-'));
+              lineFigures.add(setTextColorBlue('-'));
             } else {
               lineFigures.add('-');
             }
@@ -304,8 +259,8 @@ class Game {
         } else {
           if (type != Null) {
             lineFigures.add(_isFriendFigure(point)
-                ? _setTextColorGreen(type.toString()[0])
-                : _setTextColorRed(type.toString()[0]));
+                ? setTextColorGreen(type.toString()[0])
+                : setTextColorRed(type.toString()[0]));
           } else {
             lineFigures.add('-');
           }
@@ -326,25 +281,5 @@ class Game {
       'g',
       'h',
     ].join(' '));
-  }
-
-  String _setTextColorYellow(String text) {
-    return '\x1B[33m$text\x1B[0m';
-  }
-
-  String _setTextColorRed(String text) {
-    return '\x1B[31m$text\x1B[0m';
-  }
-
-  String _setTextColorBlue(String text) {
-    return '\x1B[34m$text\x1B[0m';
-  }
-
-  String _setTextColorGreen(String text) {
-    return '\x1B[32m$text\x1B[0m';
-  }
-
-  String _setTextColorMagenta(String text) {
-    return '\x1B[35m$text\x1B[0m';
   }
 }

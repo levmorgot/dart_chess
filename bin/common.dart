@@ -9,8 +9,8 @@ List<SpaceName> pointsListToSpaceNamesList(List<Point> points) {
 
 SpaceName? stringToSpaceName(String stringPoint) {
   try {
-    SpaceName point = SpaceName.values
-        .firstWhere((element) => element.toString().split('.')[1] == stringPoint.toLowerCase());
+    SpaceName point = SpaceName.values.firstWhere((element) =>
+        element.toString().split('.')[1] == stringPoint.toLowerCase());
     return point;
   } catch (_) {
     print('Некоррктный адресс клетки');
@@ -34,4 +34,24 @@ Point spaceNameToPoint(SpaceName spaceName) {
   } catch (_) {
     throw Exception('Такой клетки на поле не существует');
   }
+}
+
+String setTextColorYellow(String text) {
+  return '\x1B[33m$text\x1B[0m';
+}
+
+String setTextColorRed(String text) {
+  return '\x1B[31m$text\x1B[0m';
+}
+
+String setTextColorBlue(String text) {
+  return '\x1B[34m$text\x1B[0m';
+}
+
+String setTextColorGreen(String text) {
+  return '\x1B[32m$text\x1B[0m';
+}
+
+String setTextColorMagenta(String text) {
+  return '\x1B[35m$text\x1B[0m';
 }
