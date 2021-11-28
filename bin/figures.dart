@@ -93,6 +93,18 @@ abstract class Figure {
     return false;
   }
 
+  bool get moveToDiagonal {
+    return false;
+  }
+
+  bool get moveToStraight {
+    return false;
+  }
+
+  bool get moveAround {
+    return false;
+  }
+
   void gambit(SpaceName point) {
     _position = point;
     print("$_color $runtimeType на $_position");
@@ -175,6 +187,11 @@ class King extends Figure {
       : super(color, startSide, position);
 
   @override
+  bool get moveAround {
+    return true;
+  }
+
+  @override
   List<SpaceName> getPointsToMove() {
     var x = chessboard[_position]!.x;
     var y = chessboard[_position]!.y;
@@ -197,6 +214,16 @@ class Queen extends Figure with StraightRunner, DiagonalRunner {
       : super(color, startSide, position);
 
   @override
+  bool get moveToDiagonal {
+    return true;
+  }
+
+  @override
+  bool get moveToStraight {
+    return true;
+  }
+
+  @override
   List<SpaceName> getPointsToMove() {
     return getPointsToStraightMove(_position) +
         getPointsToDiagonalMove(_position);
@@ -208,6 +235,11 @@ class Bishop extends Figure with DiagonalRunner {
       : super(color, startSide, position);
 
   @override
+  bool get moveToDiagonal {
+    return true;
+  }
+
+  @override
   List<SpaceName> getPointsToMove() {
     return getPointsToDiagonalMove(_position);
   }
@@ -216,6 +248,11 @@ class Bishop extends Figure with DiagonalRunner {
 class Castle extends Figure with StraightRunner {
   Castle(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
+
+  @override
+  bool get moveToStraight {
+    return true;
+  }
 
   @override
   List<SpaceName> getPointsToMove() {

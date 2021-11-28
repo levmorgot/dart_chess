@@ -129,6 +129,13 @@ class Game {
   List<SpaceName> _getPossibilityPointsDiagonal(Figure figure) {
     List<SpaceName> names = figure.getPointsToMove();
     final Point currentPoint = spaceNameToPoint(figure.currentPosition);
+    if (figure.moveToDiagonal && figure.moveToStraight) {
+      names = names
+          .where((element) =>
+              spaceNameToPoint(element).x != currentPoint.x &&
+              spaceNameToPoint(element).y != currentPoint.y)
+          .toList();
+    }
     List<SpaceName> namesUpRight = [];
     List<SpaceName> namesUpLeft = [];
     List<SpaceName> namesDownRight = [];
@@ -164,6 +171,13 @@ class Game {
   List<SpaceName> _getPossibilityPointsStraight(Figure figure) {
     List<SpaceName> names = figure.getPointsToMove();
     final Point currentPoint = spaceNameToPoint(figure.currentPosition);
+    if (figure.moveToDiagonal && figure.moveToStraight) {
+      names = names
+          .where((element) =>
+      spaceNameToPoint(element).x == currentPoint.x ||
+          spaceNameToPoint(element).y == currentPoint.y)
+          .toList();
+    }
     List<SpaceName> namesUp = [];
     List<SpaceName> namesLeft = [];
     List<SpaceName> namesDown = [];
@@ -213,19 +227,19 @@ class Game {
     if (figure.canJump) {
       return wayPoints;
     }
-    if (figure.runtimeType == King) {
+    if (figure.moveAround) {
       return wayPoints;
     }
-    if (figure.runtimeType == Queen) {
+    if (figure.moveToDiagonal && figure.moveToStraight) {
       wayPoints = _getPossibilityPointsDiagonal(figure) +
           _getPossibilityPointsStraight(figure);
       return wayPoints;
     }
-    if (figure.runtimeType == Bishop) {
+    if (figure.moveToDiagonal) {
       wayPoints = _getPossibilityPointsDiagonal(figure);
       return wayPoints;
     }
-    if (figure.runtimeType == Castle) {
+    if (figure.moveToStraight) {
       wayPoints = _getPossibilityPointsStraight(figure);
       return wayPoints;
     }
