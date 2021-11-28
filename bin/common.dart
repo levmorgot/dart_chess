@@ -13,7 +13,7 @@ SpaceName? stringToSpaceName(String stringPoint) {
         element.toString().split('.')[1] == stringPoint.toLowerCase());
     return point;
   } catch (_) {
-    print('Некоррктный адресс клетки');
+    print('Некорректный адрес клетки');
     return null;
   }
 }
