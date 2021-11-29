@@ -85,6 +85,10 @@ abstract class Figure {
     _death = true;
   }
 
+  Color get color {
+    return _color;
+  }
+
   bool get deathStatus {
     return _death;
   }

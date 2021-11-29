@@ -20,6 +20,9 @@ class Player {
     } catch (_) {
       return null;
     }
+  }
 
+  Color get color {
+    return figures[0].color;
   }
 }
