@@ -115,6 +115,10 @@ abstract class Figure {
     return false;
   }
 
+  bool get isKing {
+    return false;
+  }
+
   void gambit(SpaceName point) {
     _position = point;
     if (!_moved) {
@@ -195,6 +199,11 @@ class King extends Figure {
 
   @override
   bool get moveAround {
+    return true;
+  }
+
+  @override
+  bool get isKing {
     return true;
   }
 
