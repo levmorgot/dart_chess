@@ -163,28 +163,28 @@ class Horse extends Figure {
   Horse(Color color, Side startSide, SpaceName position)
       : super(color, startSide, position);
 
-    @override
-    bool get canJump {
-      return true;
-    }
-
-    @override
-    List<SpaceName> getPointsToMove() {
-      var x = chessboard[_position]!.x;
-      var y = chessboard[_position]!.y;
-      List<Point> newPoints = [
-        Point(x + 2, y + 1),
-        Point(x + 2, y - 1),
-        Point(x - 2, y + 1),
-        Point(x - 2, y - 1),
-        Point(x + 1, y + 2),
-        Point(x + 1, y - 2),
-        Point(x - 1, y + 2),
-        Point(x - 1, y - 2),
-      ];
-      return pointsListToSpaceNamesList(newPoints);
-    }
+  @override
+  bool get canJump {
+    return true;
   }
+
+  @override
+  List<SpaceName> getPointsToMove() {
+    var x = chessboard[_position]!.x;
+    var y = chessboard[_position]!.y;
+    List<Point> newPoints = [
+      Point(x + 2, y + 1),
+      Point(x + 2, y - 1),
+      Point(x - 2, y + 1),
+      Point(x - 2, y - 1),
+      Point(x + 1, y + 2),
+      Point(x + 1, y - 2),
+      Point(x - 1, y + 2),
+      Point(x - 1, y - 2),
+    ];
+    return pointsListToSpaceNamesList(newPoints);
+  }
+}
 
 class King extends Figure {
   King(Color color, Side startSide, SpaceName position)

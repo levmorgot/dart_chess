@@ -120,9 +120,8 @@ abstract class Game {
 }
 
 class ChessGame extends Game {
-
-  ChessGame(activePlayer, player1, player2) : super(activePlayer,  player1, player2) {
-
+  ChessGame(activePlayer, player1, player2)
+      : super(activePlayer, player1, player2) {
     chessboard.forEach((k, v) {
       gameBoard[k] = player1.getFigureByPosition(k);
       if (gameBoard[k] == null) {
@@ -162,8 +161,8 @@ class ChessGame extends Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       names = names
           .where((element) =>
-      spaceNameToPoint(element).x != currentPoint.x &&
-          spaceNameToPoint(element).y != currentPoint.y)
+              spaceNameToPoint(element).x != currentPoint.x &&
+              spaceNameToPoint(element).y != currentPoint.y)
           .toList();
     }
     List<SpaceName> namesUpRight = [];
@@ -204,8 +203,8 @@ class ChessGame extends Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       names = names
           .where((element) =>
-      spaceNameToPoint(element).x == currentPoint.x ||
-          spaceNameToPoint(element).y == currentPoint.y)
+              spaceNameToPoint(element).x == currentPoint.x ||
+              spaceNameToPoint(element).y == currentPoint.y)
           .toList();
     }
     List<SpaceName> namesUp = [];

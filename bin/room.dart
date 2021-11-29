@@ -50,7 +50,7 @@ class Room {
           namePointWithFigure = stringToSpaceName(line);
         }
         figure = game.chooseFigure(namePointWithFigure);
-        if (game.getPossibilityPoints(figure!).isEmpty){
+        if (game.getPossibilityPoints(figure!).isEmpty) {
           figure = null;
           print(Process.runSync("clear", [], runInShell: true).stdout);
           game.activeFigure = null;
