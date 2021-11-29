@@ -16,18 +16,9 @@ class Room {
   Player? winPlayer;
 
   Room(this.id, player1Id, player2Id) {
-    player1 = Player(player1Id, ChessFigureFactory(Color.black, Side.bottom));
-    player2 = Player(player1Id, ChessFigureFactory(Color.white, Side.top));
-    Player activePlayer = _chooseActivePlayer();
-    game = ChessGame(activePlayer, player1, player2);
-  }
-
-  Player _chooseActivePlayer() {
-    return player1.color == Color.white ? player1 : player2;
-  }
-
-  void _switchActivePlayer() {
-    game.activePlayer = game.activePlayer == player1 ? player2 : player1;
+    player1 = Player(player1Id, ChessFigureFactory(Color.white, Side.bottom));
+    player2 = Player(player2Id, ChessFigureFactory(Color.black, Side.top));
+    game = ChessGame(player1, player2);
   }
 
   void play() {
@@ -76,7 +67,6 @@ class Room {
         }
       }
       game.move(figure, nameAimPoint!);
-      _switchActivePlayer();
     }
   }
 }

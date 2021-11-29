@@ -75,6 +75,8 @@ abstract class Figure {
   SpaceName _position;
   bool _death = false;
 
+  bool _moved = false;
+
   Figure(this._color, this._startSide, this._position);
 
   SpaceName get currentPosition {
@@ -87,6 +89,10 @@ abstract class Figure {
 
   Color get color {
     return _color;
+  }
+
+  bool  get moved {
+    return _moved;
   }
 
   bool get deathStatus {
@@ -111,6 +117,9 @@ abstract class Figure {
 
   void gambit(SpaceName point) {
     _position = point;
+    if (!_moved) {
+      _moved = true;
+    }
     print("$_color $runtimeType на $_position");
   }
 
@@ -141,12 +150,6 @@ class Pawn extends Figure {
       newPoints.add(Point(x, newYCoordForDoubleCells));
     }
     return pointsListToSpaceNamesList(newPoints);
-  }
-
-  @override
-  void gambit(SpaceName point) {
-    _moved = true;
-    super.gambit(point);
   }
 
   @override

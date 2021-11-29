@@ -7,10 +7,20 @@ import 'player.dart';
 
 abstract class Game {
   Map<SpaceName, Figure?> gameBoard = {};
+  late Player player1;
+  late Player player2;
   late Player activePlayer;
   Figure? activeFigure;
 
-  Game(this.activePlayer, player1, player2);
+  Game(this.player1, this.player2);
+
+  void _switchActivePlayer() {
+    activePlayer = activePlayer == player1 ? player2 : player1;
+  }
+
+  Player _chooseActivePlayer() {
+    return player1.color == Color.white ? player1 : player2;
+  }
 
   Figure? chooseFigure(SpaceName point) {
     try {
@@ -120,8 +130,10 @@ abstract class Game {
 }
 
 class ChessGame extends Game {
-  ChessGame(activePlayer, player1, player2)
-      : super(activePlayer, player1, player2) {
+
+  ChessGame(player1, player2) : super(player1, player2) {
+    activePlayer = _chooseActivePlayer();
+
     chessboard.forEach((k, v) {
       gameBoard[k] = player1.getFigureByPosition(k);
       if (gameBoard[k] == null) {
@@ -161,8 +173,8 @@ class ChessGame extends Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       names = names
           .where((element) =>
-              spaceNameToPoint(element).x != currentPoint.x &&
-              spaceNameToPoint(element).y != currentPoint.y)
+      spaceNameToPoint(element).x != currentPoint.x &&
+          spaceNameToPoint(element).y != currentPoint.y)
           .toList();
     }
     List<SpaceName> namesUpRight = [];
@@ -203,8 +215,8 @@ class ChessGame extends Game {
     if (figure.moveToDiagonal && figure.moveToStraight) {
       names = names
           .where((element) =>
-              spaceNameToPoint(element).x == currentPoint.x ||
-              spaceNameToPoint(element).y == currentPoint.y)
+      spaceNameToPoint(element).x == currentPoint.x ||
+          spaceNameToPoint(element).y == currentPoint.y)
           .toList();
     }
     List<SpaceName> namesUp = [];
@@ -280,5 +292,8 @@ class ChessGame extends Game {
     figure.gambit(aimPoint);
     gameBoard[figure.currentPosition] = figure;
     activeFigure = null;
+    _switchActivePlayer();
   }
+
+
 }
