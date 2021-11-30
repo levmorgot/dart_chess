@@ -1,6 +1,6 @@
-import 'constants.dart';
-import 'figure_factories.dart';
-import 'figures.dart';
+import 'common/constants.dart';
+import 'figures/figure_factories.dart';
+import 'figures/figure.dart';
 
 class Player {
   final int id;
@@ -14,11 +14,11 @@ class Player {
     return figures.map((e) => e.currentPosition).toList();
   }
 
-  Figure? getFigureByPosition(SpaceName position) {
+  Figure getFigureByPosition(SpaceName position) {
     try {
       return figures.where((e) => e.currentPosition == position).toList().first;
     } catch (_) {
-      return null;
+      return NullFigure();
     }
   }
 

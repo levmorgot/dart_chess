@@ -1,8 +1,8 @@
 library figures;
 
 import 'dart:math';
-import 'common.dart';
-import 'constants.dart';
+import '../common/utils.dart';
+import '../common/constants.dart';
 
 mixin StraightRunner {
   //Move to horizontal
@@ -273,5 +273,21 @@ class Castle extends Figure with StraightRunner {
   @override
   List<SpaceName> getPointsToMove() {
     return getPointsToStraightMove(_position);
+  }
+}
+
+class NullFigure extends Figure {
+
+  NullFigure._privateConstructor() : super(Color.white, Side.top, SpaceName.a1);
+
+  static final NullFigure _instance = NullFigure._privateConstructor();
+
+  factory NullFigure() {
+    return _instance;
+  }
+
+  @override
+  List<SpaceName> getPointsToMove() {
+    return [];
   }
 }

@@ -1,16 +1,16 @@
 import 'dart:math';
 
-import 'common.dart';
-import 'constants.dart';
-import 'figures.dart';
-import 'player.dart';
+import '../common/utils.dart';
+import '../common/constants.dart';
+import '../figures/figure.dart';
+import '../player.dart';
 
 abstract class Game {
-  Map<SpaceName, Figure?> gameBoard = {};
+  Map<SpaceName, Figure> gameBoard = {};
   late Player player1;
   late Player player2;
   late Player activePlayer;
-  Figure? activeFigure;
+  late Figure activeFigure;
 
   Game(this.player1, this.player2);
 
@@ -22,26 +22,28 @@ abstract class Game {
     return player1.color == Color.white ? player1 : player2;
   }
 
-  Figure? chooseFigure(SpaceName point) {
+  Figure chooseFigure(SpaceName point) {
     try {
       Figure figure = gameBoard[point]!;
-      try {
-        Figure fig =
-            activePlayer.figures.firstWhere((element) => element == figure);
-        activeFigure = fig;
-        return fig;
-      } catch (_) {
+      if (_isFriendFigure(point)) {
+        return figure;
+      } else if (_isEnemyFigure(point)) {
         print('Вы не можете играть фигурами другого игрока');
-        return null;
+      } else {
+        print('Эта клетка пуста');
       }
+      return NullFigure();
     } catch (_) {
-      print('В клетке нет фигуры');
-      return null;
+      throw Exception('На поле оказался null вместо NullFigure');
     }
   }
 
-  Figure? _getFigure(SpaceName point) {
-    return gameBoard[point];
+  Figure _getFigure(SpaceName point) {
+    try {
+      return gameBoard[point]!;
+    } catch (_) {
+      throw Exception('На поле оказался null вместо NullFigure');
+    }
   }
 
   bool _isFriendFigure(SpaceName point) {
@@ -49,11 +51,11 @@ abstract class Game {
   }
 
   bool _isEmptyPoint(SpaceName point) {
-    return gameBoard[point] == null;
+    return gameBoard[point] == NullFigure();
   }
 
   bool _isEnemyFigure(SpaceName point) {
-    return gameBoard[point] != null &&
+    return !_isEmptyPoint(point) &&
         !activePlayer.figures.contains(gameBoard[point]);
   }
 
@@ -79,19 +81,20 @@ abstract class Game {
       'h',
     ].join(' '));
     print('___________________');
+    Figure nullFigure = NullFigure();
     List<SpaceName> possibilityPoints =
-        activeFigure != null ? getPossibilityPoints(activeFigure!) : [];
+        activeFigure != nullFigure ? getPossibilityPoints(activeFigure) : [];
     for (int x = chessboardSizeX - 1; x >= 0; x--) {
       List<String> lineFigures = [];
       for (int y = 0; y < chessboardSizeX; y++) {
         var point = SpaceName.values[y * 8 + x];
         var valuePoint = gameBoard[point];
         var type = valuePoint.runtimeType;
-        if (activeFigure != null) {
-          if (type != Null) {
+        if (activeFigure != nullFigure) {
+          if (type != NullFigure) {
             if (possibilityPoints.contains(point)) {
               lineFigures.add(setTextColorMagenta(type.toString()[0]));
-            } else if (activeFigure!.currentPosition == point) {
+            } else if (activeFigure.currentPosition == point) {
               lineFigures.add(setTextColorYellow(type.toString()[0]));
             } else {
               lineFigures.add(_isFriendFigure(point)
@@ -106,7 +109,7 @@ abstract class Game {
             }
           }
         } else {
-          if (type != Null) {
+          if (type != NullFigure) {
             lineFigures.add(_isFriendFigure(point)
                 ? setTextColorGreen(type.toString()[0])
                 : setTextColorRed(type.toString()[0]));
@@ -145,7 +148,7 @@ class ChessGame extends Game {
 
     chessboard.forEach((k, v) {
       gameBoard[k] = player1.getFigureByPosition(k);
-      if (gameBoard[k] == null) {
+      if (gameBoard[k] == NullFigure()) {
         gameBoard[k] = player2.getFigureByPosition(k);
       }
     });
@@ -392,21 +395,36 @@ class ChessGame extends Game {
     }
   }
 
+  bool checkCheckmate() {
+    _checkCheck();
+    if (_isCheck) {
+      Figure king =
+          activePlayer.figures.firstWhere((element) => element.isKing);
+      if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
+        return true;
+      }
+      return false;
+    } else {
+      return false;
+    }
+  }
+
   @override
   void move(Figure figure, SpaceName aimPoint) {
+    Figure nullFigure = NullFigure();
     _isCheck = false;
     _playerWithCheck = null;
     _attackingFigures.clear();
     _closedAttackingFigures.clear();
     _coveringFigures.clear();
-    gameBoard[figure.currentPosition] = null;
-    if (gameBoard[aimPoint] != null) {
+    gameBoard[figure.currentPosition] = nullFigure;
+    if (gameBoard[aimPoint] != nullFigure) {
       gameBoard[aimPoint]!.toDeath();
     }
     figure.gambit(aimPoint);
     gameBoard[figure.currentPosition] = figure;
-    activeFigure = null;
+    activeFigure = nullFigure;
     _switchActivePlayer();
-    _checkCheck();
+    print(checkCheckmate());
   }
 }

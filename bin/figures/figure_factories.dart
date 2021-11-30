@@ -1,5 +1,5 @@
-import 'constants.dart';
-import 'figures.dart';
+import '../common/constants.dart';
+import 'figure.dart';
 
 abstract class FigureFactory {
   final Side _startSide;

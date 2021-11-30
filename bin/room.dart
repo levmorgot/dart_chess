@@ -1,10 +1,10 @@
 import 'dart:io';
 
-import 'common.dart';
-import 'constants.dart';
-import 'figure_factories.dart';
-import 'figures.dart';
-import 'game.dart';
+import 'common/utils.dart';
+import 'common/constants.dart';
+import 'figures/figure_factories.dart';
+import 'figures/figure.dart';
+import 'games/game.dart';
 import 'player.dart';
 
 class Room {
@@ -24,31 +24,66 @@ class Room {
   void play() {
     SpaceName? namePointWithFigure;
     SpaceName? nameAimPoint;
-    Figure? figure;
+    Figure figure;
     bool canMove = false;
+
+    Figure f = game.chooseFigure(SpaceName.f2);
+    game.move(f, SpaceName.f4);
+
+    f = game.chooseFigure(SpaceName.e7);
+    game.move(f, SpaceName.e6);
+
+    f = game.chooseFigure(SpaceName.f4);
+    game.move(f, SpaceName.f5);
+
+    f = game.chooseFigure(SpaceName.e6);
+    game.move(f, SpaceName.f5);
+
+    f = game.chooseFigure(SpaceName.e2);
+    game.move(f, SpaceName.e4);
+
+    f = game.chooseFigure(SpaceName.d8);
+    game.move(f, SpaceName.e7);
+
+    f = game.chooseFigure(SpaceName.e4);
+    game.move(f, SpaceName.f5);
+
+    f = game.chooseFigure(SpaceName.e7);
+    game.move(f, SpaceName.e6);
+
+    f = game.chooseFigure(SpaceName.h1);
+    game.move(f, SpaceName.e2);
+
+
+    f = game.chooseFigure(SpaceName.e6);
+    game.move(f, SpaceName.e5);
+
+    Figure nullFigure = NullFigure();
+
     while (winPlayer == null) {
-      game.printBoardColor();
       namePointWithFigure = null;
       nameAimPoint = null;
-      figure = null;
+      figure = nullFigure;
       canMove = false;
 
-      while (figure == null) {
+      while (figure == nullFigure) {
         namePointWithFigure = null;
+        figure = nullFigure;
+        game.printBoardColor();
         while (namePointWithFigure == null) {
           stdout.write("Введите адресс клетки со своей фигурой (a1): ");
           String line = stdin.readLineSync()!;
           namePointWithFigure = stringToSpaceName(line);
         }
         figure = game.chooseFigure(namePointWithFigure);
-        if (game.getPossibilityPoints(figure!).isEmpty) {
-          figure = null;
+
+        if (figure != nullFigure && game.getPossibilityPoints(figure).isEmpty) {
+
           print(Process.runSync("clear", [], runInShell: true).stdout);
-          game.activeFigure = null;
-          game.printBoardColor();
           print('Эта фигура сейчас не может двигаться');
         }
       }
+      game.activeFigure = figure;
       game.printBoardColor();
       while (!canMove) {
         nameAimPoint = null;
