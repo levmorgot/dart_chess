@@ -27,36 +27,36 @@ class Room {
     Figure figure;
     bool canMove = false;
 
-    Figure f = game.chooseFigure(SpaceName.f2);
-    game.move(f, SpaceName.f4);
-
-    f = game.chooseFigure(SpaceName.e7);
-    game.move(f, SpaceName.e6);
-
-    f = game.chooseFigure(SpaceName.f4);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e6);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e2);
-    game.move(f, SpaceName.e4);
-
-    f = game.chooseFigure(SpaceName.d8);
-    game.move(f, SpaceName.e7);
-
-    f = game.chooseFigure(SpaceName.e4);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e7);
-    game.move(f, SpaceName.e6);
-
-    f = game.chooseFigure(SpaceName.h1);
-    game.move(f, SpaceName.e2);
-
-
-    f = game.chooseFigure(SpaceName.e6);
-    game.move(f, SpaceName.e5);
+    // Figure f = game.chooseFigure(SpaceName.f2);
+    // game.move(f, SpaceName.f4);
+    //
+    // f = game.chooseFigure(SpaceName.e7);
+    // game.move(f, SpaceName.e6);
+    //
+    // f = game.chooseFigure(SpaceName.f4);
+    // game.move(f, SpaceName.f5);
+    //
+    // f = game.chooseFigure(SpaceName.e6);
+    // game.move(f, SpaceName.f5);
+    //
+    // f = game.chooseFigure(SpaceName.e2);
+    // game.move(f, SpaceName.e4);
+    //
+    // f = game.chooseFigure(SpaceName.d8);
+    // game.move(f, SpaceName.e7);
+    //
+    // f = game.chooseFigure(SpaceName.e4);
+    // game.move(f, SpaceName.f5);
+    //
+    // f = game.chooseFigure(SpaceName.e7);
+    // game.move(f, SpaceName.e6);
+    //
+    // f = game.chooseFigure(SpaceName.h1);
+    // game.move(f, SpaceName.e2);
+    //
+    //
+    // f = game.chooseFigure(SpaceName.e6);
+    // game.move(f, SpaceName.e5);
 
     Figure nullFigure = NullFigure();
 
@@ -78,8 +78,8 @@ class Room {
         figure = game.chooseFigure(namePointWithFigure);
 
         if (figure != nullFigure && game.getPossibilityPoints(figure).isEmpty) {
-
-          print(Process.runSync("clear", [], runInShell: true).stdout);
+          namePointWithFigure = null;
+          figure = nullFigure;
           print('Эта фигура сейчас не может двигаться');
         }
       }
