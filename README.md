@@ -1,1 +1,1 @@
-A simple command-line application.
+Библиотека для проведения игры в шахматы
