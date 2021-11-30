@@ -51,12 +51,25 @@ class Room {
     f = game.chooseFigure(SpaceName.e7);
     game.move(f, SpaceName.e6);
 
-    f = game.chooseFigure(SpaceName.h1);
-    game.move(f, SpaceName.e2);
+    f = game.chooseFigure(SpaceName.f2);
+    game.move(f, SpaceName.f4);
 
 
     f = game.chooseFigure(SpaceName.e6);
     game.move(f, SpaceName.e5);
+
+    f = game.chooseFigure(SpaceName.f5);
+    game.move(f, SpaceName.f5);
+
+    f = game.chooseFigure(SpaceName.e5);
+    game.move(f, SpaceName.e4);
+
+    // f = game.chooseFigure(SpaceName.f2);
+    // game.move(f, SpaceName.f4);
+    //
+    //
+    // f = game.chooseFigure(SpaceName.a8);
+    // game.move(f, SpaceName.e3);
 
     Figure nullFigure = NullFigure();
 
@@ -87,7 +100,6 @@ class Room {
       game.printBoardColor();
       while (!canMove) {
         nameAimPoint = null;
-        print(game.getPossibilityPoints(figure));
         while (nameAimPoint == null) {
           stdout.write("Введите адресс клетки (a1): ");
           String line = stdin.readLineSync()!;
