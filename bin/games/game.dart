@@ -18,7 +18,7 @@ abstract class Game {
     activePlayer = activePlayer == player1 ? player2 : player1;
   }
 
-  void nextStep(){
+  void nextStep() {
     _switchActivePlayer();
   }
 
@@ -59,11 +59,14 @@ abstract class Game {
   }
 
   bool _isEnemyFigure(SpaceName point) {
-    return !_isEmptyPoint(point) &&
-        !_isFriendFigure(point);
+    return !_isEmptyPoint(point) && !_isFriendFigure(point);
   }
 
   List<SpaceName> getPossibilityPoints(Figure figure);
+
+  bool canMove(Figure figure) {
+    return getPossibilityPoints(figure).isNotEmpty;
+  }
 
   bool checkPossibilityToMove(Figure figure, SpaceName nameAimPoint) {
     List<SpaceName> wayPoints = getPossibilityPoints(figure);
@@ -183,10 +186,11 @@ class ChessGame extends Game {
     }
   }
 
-  Figure _getEnemyOnStraightWayToPoint(Figure figure, SpaceName pointName) {
+  List<SpaceName> _getStraightWayToPoint(Figure figure, SpaceName pointName) {
     final Point currentPoint = spaceNameToPoint(figure.currentPosition);
     final Point point = spaceNameToPoint(pointName);
-    List<SpaceName> pointsForAttack = getPossibilityPoints(figure);
+    List<SpaceName> pointsForAttack = _getPossibilityPointsSimple(figure);
+    List<SpaceName> wayForAttack = [];
 
     for (var element in pointsForAttack) {
       Point attackPoint = spaceNameToPoint(element);
@@ -205,17 +209,18 @@ class ChessGame extends Game {
             attackPoint.x < currentPoint.x && attackPoint.y == currentPoint.y;
       }
 
-      if (isNeededWay && _isEnemyFigure(element)) {
-        return _getFigure(element);
+      if (isNeededWay) {
+        wayForAttack.add(element);
       }
     }
-    return NullFigure();
+    return wayForAttack;
   }
 
-  Figure _getEnemyOnDiagonalWayToPoint(Figure figure, SpaceName pointName) {
+  List<SpaceName> _getDiagonalWayToPoint(Figure figure, SpaceName pointName) {
     final Point currentPoint = spaceNameToPoint(figure.currentPosition);
     final Point point = spaceNameToPoint(pointName);
-    List<SpaceName> pointsForAttack = getPossibilityPoints(figure);
+    List<SpaceName> pointsForAttack = _getPossibilityPointsSimple(figure);
+    List<SpaceName> wayForAttack = [];
 
     for (var element in pointsForAttack) {
       Point attackPoint = spaceNameToPoint(element);
@@ -234,8 +239,17 @@ class ChessGame extends Game {
             attackPoint.x > currentPoint.x && attackPoint.y > currentPoint.y;
       }
 
-      if (isNeededWay && _isEnemyFigure(element)) {
-        return _getFigure(element);
+      if (isNeededWay) {
+        wayForAttack.add(element);
+      }
+    }
+    return wayForAttack;
+  }
+
+  Figure _getEnemyOnWayToPoint(List<SpaceName> pointsForAttack) {
+    for (var point in pointsForAttack) {
+      if (_isEnemyFigure(point)) {
+        return _getFigure(point);
       }
     }
     return NullFigure();
@@ -322,12 +336,35 @@ class ChessGame extends Game {
     return namesDown + namesUp + namesLeft + namesRight;
   }
 
+  List<SpaceName> _getPossibilityPointsWhenKingInDanger(Figure figure) {
+    List<SpaceName> wayPoints = _getPossibilityPointsSimple(figure);
+    if (_coveringFigures.containsKey(figure)) {
+      if (wayPoints.contains(_coveringFigures[figure]!.currentPosition)) {
+        if (figure.moveToDiagonal) {
+          wayPoints = _getDiagonalWayToPoint(
+              figure, _coveringFigures[figure]!.currentPosition);
+        }
+        if (figure.moveToStraight) {
+          wayPoints = _getStraightWayToPoint(
+              figure, _coveringFigures[figure]!.currentPosition);
+        }
+      } else {
+        wayPoints = [];
+      }
+    }
+    return wayPoints;
+  }
+
   @override
   List<SpaceName> getPossibilityPoints(Figure figure) {
+    List<SpaceName> wayPoints = _kingInDanger()
+        ? _getPossibilityPointsWhenKingInDanger(figure)
+        : _getPossibilityPointsSimple(figure);
+    return wayPoints;
+  }
+
+  List<SpaceName> _getPossibilityPointsSimple(Figure figure) {
     List<SpaceName> wayPoints = [];
-    if (_isCheck && _playerWithCheck == activePlayer) {
-      wayPoints = [];
-    }
     if (figure.runtimeType == Pawn) {
       wayPoints = figure
           .getPointsToMove()
@@ -350,14 +387,28 @@ class ChessGame extends Game {
     } else if (figure.moveToStraight) {
       wayPoints = _getPossibilityPointsStraight(figure);
     }
-    if (_coveringFigures.containsKey(figure)) {
-      if (wayPoints.contains(_coveringFigures[figure]!.currentPosition)) {
-        wayPoints = [_coveringFigures[figure]!.currentPosition];
-      } else {
-        wayPoints = [];
-      }
-    }
     return wayPoints;
+  }
+
+  bool _kingInDanger() {
+    return _isCheck || _closedAttackingFigures.isNotEmpty;
+  }
+
+  @override
+  bool canMove(Figure figure) {
+    List<SpaceName> wayPoints = _kingInDanger()
+        ? _getPossibilityPointsWhenKingInDanger(figure)
+        : _getPossibilityPointsSimple(figure);
+    return wayPoints.isNotEmpty;
+  }
+
+
+  @override
+  bool checkPossibilityToMove(Figure figure, SpaceName nameAimPoint) {
+    List<SpaceName> wayPoints = _kingInDanger()
+        ? _getPossibilityPointsWhenKingInDanger(figure)
+        : _getPossibilityPointsSimple(figure);
+    return wayPoints.contains(nameAimPoint);
   }
 
   void _checkCheck() {
@@ -368,19 +419,19 @@ class ChessGame extends Game {
         enemyPlayer.figures.where((element) => !element.deathStatus).toList();
 
     for (var figure in enemyFigures) {
-      if (getPossibilityPoints(figure).contains(king.currentPosition)) {
+      if (_getPossibilityPointsSimple(figure).contains(king.currentPosition)) {
         _attackingFigures.add(figure);
       } else if (figure.getPointsToAttack().contains(king.currentPosition)) {
         if (figure.moveToDiagonal) {
-          var enemyOnDiagonalWay =
-              _getEnemyOnDiagonalWayToPoint(figure, king.currentPosition);
+          var enemyOnDiagonalWay = _getEnemyOnWayToPoint(
+              _getDiagonalWayToPoint(figure, king.currentPosition));
           if (enemyOnDiagonalWay != NullFigure()) {
             _coveringFigures[enemyOnDiagonalWay] = figure;
           }
         }
         if (figure.moveToStraight) {
-          var enemyOnStraightWay =
-              _getEnemyOnStraightWayToPoint(figure, king.currentPosition);
+          var enemyOnStraightWay = _getEnemyOnWayToPoint(
+              _getStraightWayToPoint(figure, king.currentPosition));
           if (enemyOnStraightWay != NullFigure()) {
             _coveringFigures[enemyOnStraightWay] = figure;
           }
@@ -403,11 +454,11 @@ class ChessGame extends Game {
     _checkCheck();
     if (_isCheck) {
       print(_isCheck);
-      Figure king =
-          activePlayer.figures.firstWhere((element) => element.isKing);
-      if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
-        return true;
-      }
+      // Figure king =
+      //     activePlayer.figures.firstWhere((element) => element.isKing);
+      // if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
+      //   return true;
+      // }
       return false;
     } else {
       return false;
@@ -415,7 +466,7 @@ class ChessGame extends Game {
   }
 
   @override
-  void nextStep(){
+  void nextStep() {
     _switchActivePlayer();
     checkCheckmate();
   }
