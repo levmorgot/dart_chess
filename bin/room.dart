@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'common/utils.dart';
 import 'common/constants.dart';
@@ -26,50 +27,6 @@ class Room {
     SpaceName? nameAimPoint;
     Figure figure;
     bool canMove = false;
-
-    Figure f = game.chooseFigure(SpaceName.f2);
-    game.move(f, SpaceName.f4);
-
-    f = game.chooseFigure(SpaceName.e7);
-    game.move(f, SpaceName.e6);
-
-    f = game.chooseFigure(SpaceName.f4);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e6);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e2);
-    game.move(f, SpaceName.e4);
-
-    f = game.chooseFigure(SpaceName.d8);
-    game.move(f, SpaceName.e7);
-
-    f = game.chooseFigure(SpaceName.e4);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e7);
-    game.move(f, SpaceName.e6);
-
-    f = game.chooseFigure(SpaceName.f2);
-    game.move(f, SpaceName.f4);
-
-
-    f = game.chooseFigure(SpaceName.e6);
-    game.move(f, SpaceName.e5);
-
-    f = game.chooseFigure(SpaceName.f5);
-    game.move(f, SpaceName.f5);
-
-    f = game.chooseFigure(SpaceName.e5);
-    game.move(f, SpaceName.e4);
-
-    // f = game.chooseFigure(SpaceName.f2);
-    // game.move(f, SpaceName.f4);
-    //
-    //
-    // f = game.chooseFigure(SpaceName.a8);
-    // game.move(f, SpaceName.e3);
 
     Figure nullFigure = NullFigure();
 
@@ -114,6 +71,52 @@ class Room {
         }
       }
       game.move(figure, nameAimPoint!);
+      computerStep();
+    }
+  }
+
+  void autoPlay() {
+
+    while (game.winPlayer == null) {
+      computerStep();
+    }
+  }
+
+  void computerStep() {
+    SpaceName? nameAimPoint;
+    Figure nullFigure = NullFigure();
+    Figure figure = nullFigure;
+    bool canMove = false;
+
+
+    while (figure == nullFigure) {
+      figure = nullFigure;
+      game.printBoardColor();
+      var figures = game.activePlayer.figures.where((element) => !element.deathStatus).toList();
+      int rand = Random(DateTime.now().microsecond).nextInt(figures.length);
+      figure = figures[rand];
+
+      if (figure != nullFigure && !game.canMove(figure)) {
+        figure = nullFigure;
+        print('Эта фигура сейчас не может двигаться');
+      }
+    }
+    game.activeFigure = figure;
+    game.printBoardColor();
+    var points = game.getPossibilityPoints(figure);
+    if (points.isNotEmpty) {
+      int rand = Random(DateTime.now().microsecond).nextInt(points.length);
+      nameAimPoint = points[rand];
+      canMove = game.checkPossibilityToMove(figure, nameAimPoint);
+      if (!canMove) {
+        print(Process.runSync("clear", [], runInShell: true).stdout);
+        game.printBoardColor();
+        print('Эта фигура не может сходить на эту клетку');
+      } else {
+        game.move(figure, nameAimPoint);
+      }
+    } else {
+      figure = nullFigure;
     }
   }
 }

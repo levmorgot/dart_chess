@@ -10,6 +10,7 @@ abstract class Game {
   late Player player1;
   late Player player2;
   late Player activePlayer;
+  Player? winPlayer;
   Figure activeFigure = NullFigure();
 
   Game(this.player1, this.player2);
@@ -368,10 +369,7 @@ class ChessGame extends Game {
   List<SpaceName> _getPossibilityPointsSimple(Figure figure) {
     List<SpaceName> wayPoints = [];
     if (figure.runtimeType == Pawn) {
-      wayPoints = figure
-          .getPointsToMove()
-          .where((element) => gameBoard[element] == NullFigure())
-          .toList();
+      wayPoints = _getPossibilityPointsStraight(figure);
       wayPoints += figure
           .getPointsToAttack()
           .where((element) => _isEnemyFigure(element))
@@ -450,6 +448,7 @@ class ChessGame extends Game {
     _switchActivePlayer();
     _isCheck = _attackingFigures.isNotEmpty;
     if (_isCheck) {
+      print(_playerWithCheck);
       _playerWithCheck = activePlayer;
     } else {
       _playerWithCheck = null;
@@ -460,11 +459,17 @@ class ChessGame extends Game {
     _checkCheck();
     if (_isCheck) {
       print(_isCheck);
-      // Figure king =
-      //     activePlayer.figures.firstWhere((element) => element.isKing);
-      // if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
-      //   return true;
-      // }
+      Figure king =
+          activePlayer.figures.firstWhere((element) => element.isKing);
+          if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
+            winPlayer = _playerWithCheck;
+            return true;
+          } else {
+            if (king.deathStatus){
+              winPlayer = _playerWithCheck;
+              return true;
+            }
+          }
       return false;
     } else {
       return false;
