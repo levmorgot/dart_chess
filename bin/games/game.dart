@@ -331,7 +331,7 @@ class ChessGame extends Game {
     if (figure.runtimeType == Pawn) {
       wayPoints = figure
           .getPointsToMove()
-          .where((element) => gameBoard[element] == null)
+          .where((element) => gameBoard[element] == NullFigure())
           .toList();
       wayPoints += figure
           .getPointsToAttack()
