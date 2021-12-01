@@ -17,8 +17,8 @@ class Room {
   Player? winPlayer;
 
   Room(this.id, player1Id, player2Id) {
-    player1 = Player(player1Id, ChessFigureFactory(Color.white, Side.bottom));
-    player2 = Player(player2Id, ChessFigureFactory(Color.black, Side.top));
+    player1 = Player(player1Id, ChessFigureFactory(Color.white, Side.top));
+    player2 = Player(player2Id, ChessFigureFactory(Color.black, Side.bottom));
     game = ChessGame(player1, player2);
   }
 
