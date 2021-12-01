@@ -342,7 +342,7 @@ class ChessGame extends Game {
       if (_isCheck) {
         if (figure.runtimeType == King) {
           List<SpaceName> dangerWay = [];
-          List<Figure> enemyFigures =_getEnemyFigures();
+          List<Figure> enemyFigures =_getLiveEnemyFigures();
 
           for (var point in wayPoints) {
             for (var enemyFigure in enemyFigures) {
@@ -411,75 +411,83 @@ class ChessGame extends Game {
     return wayPoints.contains(nameAimPoint);
   }
 
-  List<Figure> _getEnemyFigures() {
+  List<Figure> _getLiveEnemyFigures() {
     Player enemyPlayer = activePlayer == player1 ? player2 : player1;
-    List<Figure> enemyFigures =
-    enemyPlayer.figures.where((element) => !element.deathStatus).toList();
-    return enemyFigures;
+    return enemyPlayer.figures.where((element) => !element.deathStatus).toList();
   }
 
+  List<Figure> _getLiveFriendFigures() {
+    return activePlayer.figures.where((element) => !element.deathStatus).toList();
+  }
+
+  Figure _getEnemyKing() {
+  Player enemyPlayer = activePlayer == player1 ? player2 : player1;
+  return enemyPlayer.figures.firstWhere((element) => element.isKing);
+}
+
   void _checkCheck() {
-    Figure king = activePlayer.figures.firstWhere((element) => element.isKing);
-    List<Figure> enemyFigures =_getEnemyFigures();
-    _switchActivePlayer();
-    for (var figure in enemyFigures) {
-      if (_getPossibilityPointsSimple(figure).contains(king.currentPosition)) {
+    Figure king = _getEnemyKing();
+    for (var figure in _getLiveFriendFigures()) {
+      if (getPossibilityPoints(figure).contains(king.currentPosition)) {
         _attackingFigures.add(figure);
       } else if (figure.getPointsToAttack().contains(king.currentPosition)) {
-        if (figure.moveToDiagonal) {
-          var enemyOnDiagonalWay = _getEnemyOnWayToPoint(
+        if (figure.moveToDiagonal || figure.moveToStraight) {
+          var enemyOnWay = _getEnemyOnWayToPoint(
               _getWayToPoint(figure, king.currentPosition));
-          if (enemyOnDiagonalWay != NullFigure()) {
-            _coveringFigures[enemyOnDiagonalWay] = figure;
+          if (enemyOnWay != NullFigure()) {
+            _coveringFigures[enemyOnWay] = figure;
           }
         }
-        if (figure.moveToStraight) {
-          var enemyOnStraightWay = _getEnemyOnWayToPoint(
-              _getWayToPoint(figure, king.currentPosition));
-          if (enemyOnStraightWay != NullFigure()) {
-            _coveringFigures[enemyOnStraightWay] = figure;
-          }
-        }
-        if (_coveringFigures.isNotEmpty) {
+        if (_coveringFigures.containsValue(figure)) {
           _closedAttackingFigures.add(figure);
         }
       }
     }
-    _switchActivePlayer();
     _isCheck = _attackingFigures.isNotEmpty;
     if (_isCheck) {
-      print(_playerWithCheck);
-      _playerWithCheck = activePlayer;
-    } else {
-      _playerWithCheck = null;
+      _playerWithCheck = activePlayer == player1 ? player2 : player1;
     }
   }
 
   bool checkCheckmate() {
     _checkCheck();
+    Figure king = _getEnemyKing();
+    bool _checkmate = false;
     if (_isCheck) {
-      print(_isCheck);
-      Figure king =
-          activePlayer.figures.firstWhere((element) => element.isKing);
-          if (_attackingFigures.length > 1 && getPossibilityPoints(king).isEmpty) {
-            winPlayer = _playerWithCheck;
-            return true;
-          } else {
-            if (king.deathStatus){
-              winPlayer = _playerWithCheck;
-              return true;
+      List<Figure> enemyFigures =_getLiveEnemyFigures();
+      _switchActivePlayer();
+      if (_attackingFigures.isNotEmpty && _getPossibilityPointsWhenKingInDanger(king).isEmpty) {
+        if (_attackingFigures.length > 1) {
+          _checkmate = true;
+        } else {
+          for (var figure in enemyFigures) {
+            if (_getPossibilityPointsWhenKingInDanger(figure).isNotEmpty) {
+              _checkmate = false;
+              break;
             }
           }
-      return false;
-    } else {
-      return false;
+        }
+      }
+      _switchActivePlayer();
     }
+    print('king.deathStatus=${king.deathStatus}');
+    if (king.deathStatus){
+      _checkmate = true;
+    }
+    if (_checkmate) {
+      winPlayer = activePlayer;
+    }
+    return _checkmate;
   }
 
   @override
   void nextStep() {
+    checkCheckmate();
     _switchActivePlayer();
     checkCheckmate();
+    if (winPlayer != null) {
+      print(winPlayer!.id);
+    }
   }
 
   @override
