@@ -208,7 +208,7 @@ class ChessGame extends Game {
       } else if (point.x > currentPoint.x && point.y > currentPoint.y) {
         isNeededWay =
             attackPoint.x > currentPoint.x && attackPoint.y > currentPoint.y;
-      } else  if (point.x == currentPoint.x && point.y < currentPoint.y) {
+      } else if (point.x == currentPoint.x && point.y < currentPoint.y) {
         isNeededWay =
             attackPoint.x == currentPoint.x && attackPoint.y < currentPoint.y;
       } else if (point.x == currentPoint.x && point.y > currentPoint.y) {
@@ -325,12 +325,12 @@ class ChessGame extends Game {
       if (wayPoints.contains(_coveringFigures[figure]!.currentPosition)) {
         wayPoints = [];
         if (figure.moveToDiagonal) {
-          wayPoints += _getWayToPoint(
-              figure, _coveringFigures[figure]!.currentPosition);
+          wayPoints +=
+              _getWayToPoint(figure, _coveringFigures[figure]!.currentPosition);
         }
         if (figure.moveToStraight) {
-          wayPoints += _getWayToPoint(
-              figure, _coveringFigures[figure]!.currentPosition);
+          wayPoints +=
+              _getWayToPoint(figure, _coveringFigures[figure]!.currentPosition);
         }
         if (figure.runtimeType == Pawn) {
           wayPoints = [_coveringFigures[figure]!.currentPosition];
@@ -342,7 +342,7 @@ class ChessGame extends Game {
       if (_isCheck) {
         if (figure.runtimeType == King) {
           List<SpaceName> dangerWay = [];
-          List<Figure> enemyFigures =_getLiveEnemyFigures();
+          List<Figure> enemyFigures = _getLiveEnemyFigures();
 
           for (var point in wayPoints) {
             for (var enemyFigure in enemyFigures) {
@@ -369,7 +369,9 @@ class ChessGame extends Game {
   List<SpaceName> _getPossibilityPointsSimple(Figure figure) {
     List<SpaceName> wayPoints = [];
     if (figure.runtimeType == Pawn) {
-      wayPoints = _getPossibilityPointsStraight(figure);
+      wayPoints = _getPossibilityPointsStraight(figure)
+          .where((element) => gameBoard[element] == NullFigure())
+          .toList();
       wayPoints += figure
           .getPointsToAttack()
           .where((element) => _isEnemyFigure(element))
@@ -391,7 +393,9 @@ class ChessGame extends Game {
   }
 
   bool _kingInDanger() {
-    return _isCheck || _closedAttackingFigures.isNotEmpty || _playerWithCheck == activePlayer;
+    return _isCheck ||
+        _closedAttackingFigures.isNotEmpty ||
+        _playerWithCheck == activePlayer;
   }
 
   @override
@@ -401,7 +405,6 @@ class ChessGame extends Game {
         : _getPossibilityPointsSimple(figure);
     return wayPoints.isNotEmpty;
   }
-
 
   @override
   bool checkPossibilityToMove(Figure figure, SpaceName nameAimPoint) {
@@ -413,17 +416,21 @@ class ChessGame extends Game {
 
   List<Figure> _getLiveEnemyFigures() {
     Player enemyPlayer = activePlayer == player1 ? player2 : player1;
-    return enemyPlayer.figures.where((element) => !element.deathStatus).toList();
+    return enemyPlayer.figures
+        .where((element) => !element.deathStatus)
+        .toList();
   }
 
   List<Figure> _getLiveFriendFigures() {
-    return activePlayer.figures.where((element) => !element.deathStatus).toList();
+    return activePlayer.figures
+        .where((element) => !element.deathStatus)
+        .toList();
   }
 
   Figure _getEnemyKing() {
-  Player enemyPlayer = activePlayer == player1 ? player2 : player1;
-  return enemyPlayer.figures.firstWhere((element) => element.isKing);
-}
+    Player enemyPlayer = activePlayer == player1 ? player2 : player1;
+    return enemyPlayer.figures.firstWhere((element) => element.isKing);
+  }
 
   void _checkCheck() {
     Figure king = _getEnemyKing();
@@ -454,9 +461,10 @@ class ChessGame extends Game {
     Figure king = _getEnemyKing();
     bool _checkmate = false;
     if (_isCheck) {
-      List<Figure> enemyFigures =_getLiveEnemyFigures();
+      List<Figure> enemyFigures = _getLiveEnemyFigures();
       _switchActivePlayer();
-      if (_attackingFigures.isNotEmpty && _getPossibilityPointsWhenKingInDanger(king).isEmpty) {
+      if (_attackingFigures.isNotEmpty &&
+          _getPossibilityPointsWhenKingInDanger(king).isEmpty) {
         if (_attackingFigures.length > 1) {
           _checkmate = true;
         } else {
@@ -471,7 +479,7 @@ class ChessGame extends Game {
       _switchActivePlayer();
     }
     print('king.deathStatus=${king.deathStatus}');
-    if (king.deathStatus){
+    if (king.deathStatus) {
       _checkmate = true;
     }
     if (_checkmate) {
