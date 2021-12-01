@@ -30,7 +30,7 @@ class Room {
 
     Figure nullFigure = NullFigure();
 
-    while (winPlayer == null) {
+    while (game.winPlayer == null) {
       namePointWithFigure = null;
       nameAimPoint = null;
       figure = nullFigure;
